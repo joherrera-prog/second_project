@@ -1,23 +1,42 @@
-
 import java.util.Scanner;
 
-public class Main {
-    public static void main(String[] args) {
+/**
+ * Main class for Tic-Tac-Toe game.
+ */
+public final class Main {
+
+    private Main() {
+        // Constructor vacio para ocultar el publico por defecto
+    }
+    /** Constant defining the size of the board. */
+    private static final int BOARD_SIZE = 3;
+    /**
+     * Entry point of the application.
+     * @param args command line arguments
+     */
+    public static void main(final String[] args) {
         Scanner scanner = new Scanner(System.in);
-        char[][] tablero = new char[3][3];
+        char[][] tablero = new char[BOARD_SIZE][BOARD_SIZE];
+
 
         // INICIALIZAR EL TABLERO VACIO
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
+        for (int i = 0; i < BOARD_SIZE; i++) {
+            for (int j = 0; j < BOARD_SIZE; j++) {
                 tablero[i][j] = ' '; // Llenamos con espacios en blanco
             }
         }
 
         // Imprimir tablero inicial
         System.out.println("---------");
-        System.out.println("| " + tablero[0][0] + " " + tablero[0][1] + " " + tablero[0][2] + " |");
-        System.out.println("| " + tablero[1][0] + " " + tablero[1][1] + " " + tablero[1][2] + " |");
-        System.out.println("| " + tablero[2][0] + " " + tablero[2][1] + " " + tablero[2][2] + " |");
+        System.out.println("| " + tablero[0][0] + " "
+                            + tablero[0][1]
+                            + " " + tablero[0][2] + " |");
+        System.out.println("| " + tablero[1][0] + " "
+                            + tablero[1][1]
+                            + " " + tablero[1][2] + " |");
+        System.out.println("| " + tablero[2][0] + " "
+                            + tablero[2][1]
+                            + " " + tablero[2][2] + " |");
         System.out.println("---------");
 
         char turno = 'X'; // La 'X' empieza
@@ -28,7 +47,8 @@ public class Main {
             int j = 0;
 
             // validacion de inputs
-            while (true) {
+            boolean jugadaValida = false;
+            while (!jugadaValida) {
                 if (!scanner.hasNextInt()) {
                     System.out.println("You should enter numbers!");
                     scanner.nextLine();
@@ -38,22 +58,25 @@ public class Main {
                 int fila = scanner.nextInt();
                 int columna = scanner.nextInt();
 
-                if (fila < 1 || fila > 3 || columna < 1 || columna > 3) {
+                if (fila < 1 || fila > BOARD_SIZE || columna < 1
+                        || columna > BOARD_SIZE) {
                     System.out.println("Coordinates should be from 1 to 3!");
                     continue;
                 }
 
-                //conversion
+                // conversion
                 i = fila - 1;
                 j = columna - 1;
 
                 if (tablero[i][j] == 'X' || tablero[i][j] == 'O') {
-                    System.out.println("This cell is occupied! Choose another one!");
+                    System.out.println("This cell is occupied! "
+                                        + "Choose another one!");
                     continue;
                 }
 
                 // Jugada valida
-                break;
+                jugadaValida = true;
+
             }
 
             // REGISTRAR JUGADA Y CAMBIAR TURNO
@@ -61,35 +84,59 @@ public class Main {
 
             // Imprimir el tablero actualizado
             System.out.println("---------");
-            System.out.println("| " + tablero[0][0] + " " + tablero[0][1] + " " + tablero[0][2] + " |");
-            System.out.println("| " + tablero[1][0] + " " + tablero[1][1] + " " + tablero[1][2] + " |");
-            System.out.println("| " + tablero[2][0] + " " + tablero[2][1] + " " + tablero[2][2] + " |");
+            System.out.println("| " + tablero[0][0] + " " + tablero[0][1]
+                                + " " + tablero[0][2] + " |");
+            System.out.println("| " + tablero[1][0] + " " + tablero[1][1]
+                                + " " + tablero[1][2] + " |");
+            System.out.println("| " + tablero[2][0] + " " + tablero[2][1]
+                                + " " + tablero[2][2] + " |");
             System.out.println("---------");
 
             // 4. VERIFICAR VICTORIA O EMPATE
-            boolean xWins = tablero[0][0] == 'X' && tablero[0][1] == 'X' && tablero[0][2] == 'X' ||
-                    tablero[1][0] == 'X' && tablero[1][1] == 'X' && tablero[1][2] == 'X' ||
-                    tablero[2][0] == 'X' && tablero[2][1] == 'X' && tablero[2][2] == 'X' ||
-                    tablero[0][0] == 'X' && tablero[1][0] == 'X' && tablero[2][0] == 'X' ||
-                    tablero[0][1] == 'X' && tablero[1][1] == 'X' && tablero[2][1] == 'X' ||
-                    tablero[0][2] == 'X' && tablero[1][2] == 'X' && tablero[2][2] == 'X' ||
-                    tablero[0][0] == 'X' && tablero[1][1] == 'X' && tablero[2][2] == 'X' ||
-                    tablero[0][2] == 'X' && tablero[1][1] == 'X' && tablero[2][0] == 'X';
+            boolean xWins = tablero[0][0] == 'X'
+                    && tablero[0][1] == 'X'
+                    && tablero[0][2] == 'X'
+                    || tablero[1][0] == 'X' && tablero[1][1] == 'X'
+                    && tablero[1][2] == 'X'
+                    || tablero[2][0] == 'X' && tablero[2][1] == 'X'
+                    && tablero[2][2] == 'X'
+                    || tablero[0][0] == 'X' && tablero[1][0] == 'X'
+                    && tablero[2][0] == 'X'
+                    || tablero[0][1] == 'X' && tablero[1][1] == 'X'
+                    && tablero[2][1] == 'X'
+                    || tablero[0][2] == 'X' && tablero[1][2] == 'X'
+                    && tablero[2][2] == 'X'
+                    || tablero[0][0] == 'X' && tablero[1][1] == 'X'
+                    && tablero[2][2] == 'X'
+                    || tablero[0][2] == 'X' && tablero[1][1] == 'X'
+                    && tablero[2][0] == 'X';
 
-            boolean oWins = tablero[0][0] == 'O' && tablero[0][1] == 'O' && tablero[0][2] == 'O' ||
-                    tablero[1][0] == 'O' && tablero[1][1] == 'O' && tablero[1][2] == 'O' ||
-                    tablero[2][0] == 'O' && tablero[2][1] == 'O' && tablero[2][2] == 'O' ||
-                    tablero[0][0] == 'O' && tablero[1][0] == 'O' && tablero[2][0] == 'O' ||
-                    tablero[0][1] == 'O' && tablero[1][1] == 'O' && tablero[2][1] == 'O' ||
-                    tablero[0][2] == 'O' && tablero[1][2] == 'O' && tablero[2][2] == 'O' ||
-                    tablero[0][0] == 'O' && tablero[1][1] == 'O' && tablero[2][2] == 'O' ||
-                    tablero[0][2] == 'O' && tablero[1][1] == 'O' && tablero[2][0] == 'O';
+            boolean oWins = tablero[0][0] == 'O'
+                    && tablero[0][1] == 'O'
+                    && tablero[0][2] == 'O'
+                    || tablero[1][0] == 'O' && tablero[1][1] == 'O'
+                            && tablero[1][2] == 'O'
+                    || tablero[2][0] == 'O' && tablero[2][1] == 'O'
+                    && tablero[2][2] == 'O'
+                    || tablero[0][0] == 'O' && tablero[1][0] == 'O'
+                    && tablero[2][0] == 'O'
+                    || tablero[0][1] == 'O' && tablero[1][1] == 'O'
+                    && tablero[2][1] == 'O'
+                    || tablero[0][2] == 'O' && tablero[1][2] == 'O'
+                    && tablero[2][2] == 'O'
+                    || tablero[0][0] == 'O' && tablero[1][1] == 'O'
+                    && tablero[2][2] == 'O'
+                    || tablero[0][2] == 'O' && tablero[1][1] == 'O'
+                    && tablero[2][0] == 'O';
 
             // saber si hay empate
             int vacios = 0;
-            for (int r = 0; r < 3; r++) {
-                for (int c = 0; c < 3; c++) {
-                    if (tablero[r][c] == ' ') vacios++;
+            for (int r = 0; r < BOARD_SIZE; r++) {
+                for (int c = 0; c < BOARD_SIZE; c++) {
+                    if (tablero[r][c] == ' ') {
+                        vacios++;
+                    }
+
                 }
             }
 
