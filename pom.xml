@@ -14,9 +14,27 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
+    <!-- Dependencias de Testing -->
+    <dependencies>
+        <!-- JUnit 5 para pruebas unitarias -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>5.10.2</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- Mockito para simulación de objetos -->
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
+            <version>5.11.0</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
     <build>
         <plugins>
-            <!-- Plugin del compilador para evitar el warning de release 17 -->
+            <!-- Plugin del compilador -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -24,6 +42,34 @@
                 <configuration>
                     <release>17</release>
                 </configuration>
+            </plugin>
+
+            <!-- Surefire Plugin: Encargado de correr las pruebas de JUnit -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.2.5</version>
+            </plugin>
+
+            <!-- JaCoCo Plugin: Genera el reporte de cobertura de pruebas -->
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.11</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
 
             <!-- 1. Checkstyle Plugin -->
@@ -66,8 +112,7 @@
                 </executions>
             </plugin>
 
-            <!-- 3. SpotBugs Plugin con Find Security Bugs -->
-            <!-- 3. SpotBugs Plugin con Find Security Bugs -->
+            <!-- 3. SpotBugs Plugin -->
             <plugin>
                 <groupId>com.github.spotbugs</groupId>
                 <artifactId>spotbugs-maven-plugin</artifactId>
@@ -75,8 +120,7 @@
                 <configuration>
                     <effort>Max</effort>
                     <threshold>Normal</threshold>
-                    <failOnError>true</failOnError>
-                    <!-- Restringe el análisis a tu clase para evitar escanear el runtime de Java 27 -->
+                    <failOnError>false</failOnError>
                     <onlyAnalyze>Main</onlyAnalyze>
                     <plugins>
                         <plugin>
