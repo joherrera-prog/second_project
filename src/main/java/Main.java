@@ -1,5 +1,6 @@
 import java.util.Scanner;
 
+
 /**
  * Main class for Tic-Tac-Toe game.
  */
@@ -41,7 +42,7 @@ public final class Main {
 
         char turno = 'X'; // La 'X' empieza
 
-        //validacion de todo
+        //validacion de tod0
         while (true) {
             int i = 0;
             int j = 0;
@@ -55,29 +56,31 @@ public final class Main {
                     continue;
                 }
 
+
                 int fila = scanner.nextInt();
                 int columna = scanner.nextInt();
 
-                if (fila < 1 || fila > BOARD_SIZE || columna < 1
-                        || columna > BOARD_SIZE) {
-                    System.out.println("Coordinates should be from 1 to 3!");
+
+                //Cambiamos el if por el nuevo metodo booleano de validacion
+                //de si la casilla esta libre o no
+                if (!coordenadaValida(fila, columna)) {
+                    System.out.println("This cell is not valid!");
+                    continue;
+                }
+
+                if (!casillaLibre(tablero, fila, columna)) {
+                    System.out.println("This cell is occupied!"
+                            + "Choose another one!");
                     continue;
                 }
 
                 // conversion
                 i = fila - 1;
                 j = columna - 1;
-
-                if (tablero[i][j] == 'X' || tablero[i][j] == 'O') {
-                    System.out.println("This cell is occupied! "
-                                        + "Choose another one!");
-                    continue;
-                }
-
-                // Jugada valida
                 jugadaValida = true;
-
             }
+
+
 
             // REGISTRAR JUGADA Y CAMBIAR TURNO
             tablero[i][j] = turno;
@@ -92,62 +95,16 @@ public final class Main {
                                 + " " + tablero[2][2] + " |");
             System.out.println("---------");
 
-            // 4. VERIFICAR VICTORIA O EMPATE
-            boolean xWins = tablero[0][0] == 'X'
-                    && tablero[0][1] == 'X'
-                    && tablero[0][2] == 'X'
-                    || tablero[1][0] == 'X' && tablero[1][1] == 'X'
-                    && tablero[1][2] == 'X'
-                    || tablero[2][0] == 'X' && tablero[2][1] == 'X'
-                    && tablero[2][2] == 'X'
-                    || tablero[0][0] == 'X' && tablero[1][0] == 'X'
-                    && tablero[2][0] == 'X'
-                    || tablero[0][1] == 'X' && tablero[1][1] == 'X'
-                    && tablero[2][1] == 'X'
-                    || tablero[0][2] == 'X' && tablero[1][2] == 'X'
-                    && tablero[2][2] == 'X'
-                    || tablero[0][0] == 'X' && tablero[1][1] == 'X'
-                    && tablero[2][2] == 'X'
-                    || tablero[0][2] == 'X' && tablero[1][1] == 'X'
-                    && tablero[2][0] == 'X';
 
-            boolean oWins = tablero[0][0] == 'O'
-                    && tablero[0][1] == 'O'
-                    && tablero[0][2] == 'O'
-                    || tablero[1][0] == 'O' && tablero[1][1] == 'O'
-                            && tablero[1][2] == 'O'
-                    || tablero[2][0] == 'O' && tablero[2][1] == 'O'
-                    && tablero[2][2] == 'O'
-                    || tablero[0][0] == 'O' && tablero[1][0] == 'O'
-                    && tablero[2][0] == 'O'
-                    || tablero[0][1] == 'O' && tablero[1][1] == 'O'
-                    && tablero[2][1] == 'O'
-                    || tablero[0][2] == 'O' && tablero[1][2] == 'O'
-                    && tablero[2][2] == 'O'
-                    || tablero[0][0] == 'O' && tablero[1][1] == 'O'
-                    && tablero[2][2] == 'O'
-                    || tablero[0][2] == 'O' && tablero[1][1] == 'O'
-                    && tablero[2][0] == 'O';
-
-            // saber si hay empate
-            int vacios = 0;
-            for (int r = 0; r < BOARD_SIZE; r++) {
-                for (int c = 0; c < BOARD_SIZE; c++) {
-                    if (tablero[r][c] == ' ') {
-                        vacios++;
-                    }
-
-                }
-            }
 
             // Evaluar el estado del juego
-            if (xWins) {
+            if (verificarVictoria(tablero, 'X')) {
                 System.out.println("X wins");
                 break;
-            } else if (oWins) {
+            } else if (verificarVictoria(tablero, 'O')) {
                 System.out.println("O wins");
                 break;
-            } else if (vacios == 0) {
+            } else if (tableroLleno(tablero)) {
                 System.out.println("Draw");
                 break;
             }
@@ -160,4 +117,68 @@ public final class Main {
             }
         }
     }
+    
+    /**
+     * Saber si hay empate, solia tenerlo contador y ahora como boolean  //esto es un Javadoc
+    *@param tablero la matriz del juego
+    *@return true si no hay espacios vacios, false si hay al menos uno
+     */
+    public static boolean tableroLleno(final char[][] tablero) {
+            for (int r = 0; r < BOARD_SIZE; r++) {
+                for (int c = 0; c < BOARD_SIZE; c++) {
+                    if (tablero[r][c] == ' ') {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        // saber si hay empate NUEVOOO
+    }
+
+    /**
+     * Verifica si un jugador ha ganado
+     *
+     * @param tablero la matriz del juego
+     * @param p es el caracter del jugador, X u O
+     * @return true si el jugador gano
+     */
+    public static boolean verificarVictoria(final char[][] tablero, final char p){
+        return tablero[0][0] == p && tablero[0][1] == p && tablero[0][2] == p
+                || tablero[1][0] == p && tablero[1][1] == p && tablero[1][2] == p
+                || tablero[2][0] == p && tablero[2][1] == p && tablero[2][2] == p
+                || tablero[0][0] == p && tablero[1][0] == p && tablero[2][0] == p
+                || tablero[0][1] == p && tablero[1][1] == p && tablero[2][1] == p
+                || tablero[0][2] == p && tablero[1][2] == p && tablero[2][2] == p
+                || tablero[0][0] == p && tablero[1][1] == p && tablero[2][2] == p
+                || tablero[0][2] == p && tablero[1][1] == p && tablero[2][0] == p;
+        // VERIFICAR VICTORIA O EMPATE NUEVOO
+
+    }
+
+    /**
+     * Verifica si las coordenadas son validas
+     *
+     * @param fila coordenada de la fila
+     * @param columna coordenada de la columna
+     * @return true si es valida, false si esta fuera de rango
+     */
+    public static boolean coordenadaValida(final int fila,final int columna) {
+        return fila >= 1 && fila <= BOARD_SIZE && columna >= 1 && columna <= BOARD_SIZE;
+    }
+
+
+    /**
+     * Verifica si la casilla esta libre
+     *
+     * @param tablero en matriz
+     * @param fila del 1 al 3
+     * @param columna del 1 al 3
+     * @return true si la casilla esta disponible
+     */
+
+    public static boolean casillaLibre(final char[][] tablero, final int fila,
+                                       final int columna) {
+        return tablero[fila - 1][columna - 1] == ' ';
+    }
+
 }
