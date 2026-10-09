@@ -7,7 +7,8 @@ import java.util.Scanner;
 public final class Main {
 
     private Main() {
-        // Constructor vacio para ocultar el publico por defecto
+        // Empty constructor to hide public
+        // Prevent instantiation of utility class
     }
     /** Constant defining the size of the board. */
     private static final int BOARD_SIZE = 3;
@@ -16,40 +17,41 @@ public final class Main {
      * @param args command line arguments
      */
     public static void main(final String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        char[][] tablero = new char[BOARD_SIZE][BOARD_SIZE];
+        Scanner scanner = new Scanner(System.in,
+                java.nio.charset.StandardCharsets.UTF_8);
+        char[][] board = new char[BOARD_SIZE][BOARD_SIZE];
 
 
-        // INICIALIZAR EL TABLERO VACIO
+        // Starts new board
         for (int i = 0; i < BOARD_SIZE; i++) {
             for (int j = 0; j < BOARD_SIZE; j++) {
-                tablero[i][j] = ' '; // Llenamos con espacios en blanco
+                board[i][j] = ' '; // we fill the blanks
             }
         }
 
-        // Imprimir tablero inicial
+        // Prints empty board
         System.out.println("---------");
-        System.out.println("| " + tablero[0][0] + " "
-                            + tablero[0][1]
-                            + " " + tablero[0][2] + " |");
-        System.out.println("| " + tablero[1][0] + " "
-                            + tablero[1][1]
-                            + " " + tablero[1][2] + " |");
-        System.out.println("| " + tablero[2][0] + " "
-                            + tablero[2][1]
-                            + " " + tablero[2][2] + " |");
+        System.out.println("| " + board[0][0] + " "
+                            + board[0][1]
+                            + " " + board[0][2] + " |");
+        System.out.println("| " + board[1][0] + " "
+                            + board[1][1]
+                            + " " + board[1][2] + " |");
+        System.out.println("| " + board[2][0] + " "
+                            + board[2][1]
+                            + " " + board[2][2] + " |");
         System.out.println("---------");
 
-        char turno = 'X'; // La 'X' empieza
+        char turn = 'X'; // X starts
 
-        //validacion de tod0
+        // Game validation
         while (true) {
             int i = 0;
             int j = 0;
 
-            // validacion de inputs
-            boolean jugadaValida = false;
-            while (!jugadaValida) {
+            // Input validation
+            boolean validMove = false;
+            while (!validMove) {
                 if (!scanner.hasNextInt()) {
                     System.out.println("You should enter numbers!");
                     scanner.nextLine();
@@ -57,128 +59,126 @@ public final class Main {
                 }
 
 
-                int fila = scanner.nextInt();
-                int columna = scanner.nextInt();
+                int row = scanner.nextInt();
+                int column = scanner.nextInt();
 
 
-                //Cambiamos el if por el nuevo metodo booleano de validacion
-                //de si la casilla esta libre o no
-                if (!coordenadaValida(fila, columna)) {
+                //checking in moves are valid
+                if (!isValid(row, column)) {
                     System.out.println("This cell is not valid!");
                     continue;
                 }
 
-                if (!casillaLibre(tablero, fila, columna)) {
+                if (!isFree(board, row, column)) {
                     System.out.println("This cell is occupied!"
                             + "Choose another one!");
                     continue;
                 }
 
                 // conversion
-                i = fila - 1;
-                j = columna - 1;
-                jugadaValida = true;
+                i = row - 1;
+                j = column - 1;
+                validMove = true;
             }
 
 
 
-            // REGISTRAR JUGADA Y CAMBIAR TURNO
-            tablero[i][j] = turno;
+            // Register move and change turn
+            board[i][j] = turn;
 
-            // Imprimir el tablero actualizado
+            // Print updated board
             System.out.println("---------");
-            System.out.println("| " + tablero[0][0] + " " + tablero[0][1]
-                                + " " + tablero[0][2] + " |");
-            System.out.println("| " + tablero[1][0] + " " + tablero[1][1]
-                                + " " + tablero[1][2] + " |");
-            System.out.println("| " + tablero[2][0] + " " + tablero[2][1]
-                                + " " + tablero[2][2] + " |");
+            System.out.println("| " + board[0][0] + " " + board[0][1]
+                                + " " + board[0][2] + " |");
+            System.out.println("| " + board[1][0] + " " + board[1][1]
+                                + " " + board[1][2] + " |");
+            System.out.println("| " + board[2][0] + " " + board[2][1]
+                                + " " + board[2][2] + " |");
             System.out.println("---------");
 
 
 
-            // Evaluar el estado del juego
-            if (verificarVictoria(tablero, 'X')) {
+            // Evaluate the state of the game
+            if (verifyVictory(board, 'X')) {
                 System.out.println("X wins");
                 break;
-            } else if (verificarVictoria(tablero, 'O')) {
+            } else if (verifyVictory(board, 'O')) {
                 System.out.println("O wins");
                 break;
-            } else if (tableroLleno(tablero)) {
+            } else if (fullBoard(board)) {
                 System.out.println("Draw");
                 break;
             }
 
             // continua el juego
-            if (turno == 'X') {
-                turno = 'O';
+            if (turn == 'X') {
+                turn = 'O';
             } else {
-                turno = 'X';
+                turn = 'X';
             }
         }
     }
-    
     /**
-     * Saber si hay empate, solia tenerlo contador y ahora como boolean  //esto es un Javadoc
-    *@param tablero la matriz del juego
-    *@return true si no hay espacios vacios, false si hay al menos uno
+     * Changed for boolean values.
+    *@param board is the matrix
+    *@return true if there arent free spaces
      */
-    public static boolean tableroLleno(final char[][] tablero) {
+    public static boolean fullBoard(final char[][] board) {
             for (int r = 0; r < BOARD_SIZE; r++) {
                 for (int c = 0; c < BOARD_SIZE; c++) {
-                    if (tablero[r][c] == ' ') {
+                    if (board[r][c] == ' ') {
                         return false;
                     }
                 }
             }
             return true;
-        // saber si hay empate NUEVOOO
     }
 
     /**
-     * Verifica si un jugador ha ganado
+     * Verifies if someone won.
      *
-     * @param tablero la matriz del juego
-     * @param p es el caracter del jugador, X u O
-     * @return true si el jugador gano
+     * @param board is the matrix
+     * @param p is X or O
+     * @return true if a player wins
      */
-    public static boolean verificarVictoria(final char[][] tablero, final char p){
-        return tablero[0][0] == p && tablero[0][1] == p && tablero[0][2] == p
-                || tablero[1][0] == p && tablero[1][1] == p && tablero[1][2] == p
-                || tablero[2][0] == p && tablero[2][1] == p && tablero[2][2] == p
-                || tablero[0][0] == p && tablero[1][0] == p && tablero[2][0] == p
-                || tablero[0][1] == p && tablero[1][1] == p && tablero[2][1] == p
-                || tablero[0][2] == p && tablero[1][2] == p && tablero[2][2] == p
-                || tablero[0][0] == p && tablero[1][1] == p && tablero[2][2] == p
-                || tablero[0][2] == p && tablero[1][1] == p && tablero[2][0] == p;
-        // VERIFICAR VICTORIA O EMPATE NUEVOO
+    public static boolean verifyVictory(final char[][] board, final char p) {
+        return board[0][0] == p && board[0][1] == p && board[0][2] == p
+                || board[1][0] == p && board[1][1] == p && board[1][2] == p
+                || board[2][0] == p && board[2][1] == p && board[2][2] == p
+                || board[0][0] == p && board[1][0] == p && board[2][0] == p
+                || board[0][1] == p && board[1][1] == p && board[2][1] == p
+                || board[0][2] == p && board[1][2] == p && board[2][2] == p
+                || board[0][0] == p && board[1][1] == p && board[2][2] == p
+                || board[0][2] == p && board[1][1] == p && board[2][0] == p;
+        // VERIFIES victory or draw
 
     }
 
     /**
-     * Verifica si las coordenadas son validas
+     * Verifies if coordenates are valid.
      *
-     * @param fila coordenada de la fila
-     * @param columna coordenada de la columna
-     * @return true si es valida, false si esta fuera de rango
+     * @param row coordinate
+     * @param column coordinate
+     * @return true if its valid
      */
-    public static boolean coordenadaValida(final int fila,final int columna) {
-        return fila >= 1 && fila <= BOARD_SIZE && columna >= 1 && columna <= BOARD_SIZE;
+    public static boolean isValid(final int row, final int column) {
+        return row >= 1 && row <= BOARD_SIZE && column >= 1 && column
+                <= BOARD_SIZE;
     }
 
 
     /**
-     * Verifica si la casilla esta libre
+     * Verifies if its free.
      *
-     * @param tablero en matriz
-     * @param fila del 1 al 3
-     * @param columna del 1 al 3
-     * @return true si la casilla esta disponible
+     * @param board matrix
+     * @param row 1 to 3
+     * @param column 1 to 3
+     * @return true if coordinate is available
      */
 
-    public static boolean casillaLibre(final char[][] tablero, final int fila,
-                                       final int columna) {
-        return tablero[fila - 1][columna - 1] == ' ';
+    public static boolean isFree(final char[][] board, final int row,
+                                       final int column) {
+        return board[row - 1][column - 1] == ' ';
     }
 
 }
