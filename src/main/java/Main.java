@@ -1,184 +1,187 @@
 import java.util.Scanner;
 
-
 /**
  * Main class for Tic-Tac-Toe game.
  */
 public final class Main {
 
-    private Main() {
-        // Constructor vacio para ocultar el publico por defecto
-    }
     /** Constant defining the size of the board. */
     private static final int BOARD_SIZE = 3;
+
+    /** The game board matrix. */
+    private static final char[][] BOARD = new char[BOARD_SIZE][BOARD_SIZE];
+
+    private Main() {
+        // Prevent instantiation of utility class
+    }
+
     /**
      * Entry point of the application.
+     *
      * @param args command line arguments
      */
     public static void main(final String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        char[][] tablero = new char[BOARD_SIZE][BOARD_SIZE];
+        Scanner scanner = new Scanner(System.in,
+                java.nio.charset.StandardCharsets.UTF_8);
 
+        initializeBoard();
+        printBoard();
 
-        // INICIALIZAR EL TABLERO VACIO
+        char turn = 'X';
+        boolean gameOver = false;
+
+        // Clean and readable game loop
+        while (!gameOver) {
+            // 1. Get a validated move from the user
+            //We receive whatever getValidMove returns and store it in move
+            int[] move = getValidMove(scanner);
+
+            // 2. Register move and print
+            BOARD[move[0]][move[1]] = turn;
+            printBoard();
+
+            // 3. Evaluate the state of the game
+            //Takes the last X or O and if that makes the win it prints that
+            if (verifyVictory(turn)) {
+                System.out.println(turn + " wins");
+                gameOver = true;
+            } else if (fullBoard()) {
+                System.out.println("Draw");
+                gameOver = true;
+            } else {
+                // Change turn only if the game continues
+                //Assigns current letter to 'turn'
+                turn = turn == 'X' ? 'O' : 'X';
+            }
+        }
+    }
+
+    /**
+     * Prompts the user and validates the input coordinates.
+     *
+     * @param scanner the input scanner
+     * @return an array with the valid row and column indices (0-based)
+     */
+    public static int[] getValidMove(final Scanner scanner) {
+        int validRow = -1;
+        int validCol = -1;
+        boolean valid = false;
+
+        while (!valid) {
+            if (!scanner.hasNextInt()) {
+                System.out.println("You should enter numbers!");
+                scanner.nextLine();
+                continue;
+            }
+
+            int row = scanner.nextInt();
+            int column = scanner.nextInt();
+
+            if (!isValid(row, column)) {
+                System.out.println("This cell is not valid!");
+            } else if (!isFree(row, column)) {
+                System.out.println("This cell is occupied! "
+                        + "Choose another one!");
+            } else {
+                validRow = row - 1;
+                validCol = column - 1;
+                valid = true;
+            }
+        }
+        //I created a new array (object) to store the coordinates)
+        return new int[]{validRow, validCol};
+    }
+
+    /** Initializes the board with empty spaces. */
+    public static void initializeBoard() {
         for (int i = 0; i < BOARD_SIZE; i++) {
             for (int j = 0; j < BOARD_SIZE; j++) {
-                tablero[i][j] = ' '; // Llenamos con espacios en blanco
-            }
-        }
-
-        // Imprimir tablero inicial
-        System.out.println("---------");
-        System.out.println("| " + tablero[0][0] + " "
-                            + tablero[0][1]
-                            + " " + tablero[0][2] + " |");
-        System.out.println("| " + tablero[1][0] + " "
-                            + tablero[1][1]
-                            + " " + tablero[1][2] + " |");
-        System.out.println("| " + tablero[2][0] + " "
-                            + tablero[2][1]
-                            + " " + tablero[2][2] + " |");
-        System.out.println("---------");
-
-        char turno = 'X'; // La 'X' empieza
-
-        //validacion de tod0
-        while (true) {
-            int i = 0;
-            int j = 0;
-
-            // validacion de inputs
-            boolean jugadaValida = false;
-            while (!jugadaValida) {
-                if (!scanner.hasNextInt()) {
-                    System.out.println("You should enter numbers!");
-                    scanner.nextLine();
-                    continue;
-                }
-
-
-                int fila = scanner.nextInt();
-                int columna = scanner.nextInt();
-
-
-                //Cambiamos el if por el nuevo metodo booleano de validacion
-                //de si la casilla esta libre o no
-                if (!coordenadaValida(fila, columna)) {
-                    System.out.println("This cell is not valid!");
-                    continue;
-                }
-
-                if (!casillaLibre(tablero, fila, columna)) {
-                    System.out.println("This cell is occupied!"
-                            + "Choose another one!");
-                    continue;
-                }
-
-                // conversion
-                i = fila - 1;
-                j = columna - 1;
-                jugadaValida = true;
-            }
-
-
-
-            // REGISTRAR JUGADA Y CAMBIAR TURNO
-            tablero[i][j] = turno;
-
-            // Imprimir el tablero actualizado
-            System.out.println("---------");
-            System.out.println("| " + tablero[0][0] + " " + tablero[0][1]
-                                + " " + tablero[0][2] + " |");
-            System.out.println("| " + tablero[1][0] + " " + tablero[1][1]
-                                + " " + tablero[1][2] + " |");
-            System.out.println("| " + tablero[2][0] + " " + tablero[2][1]
-                                + " " + tablero[2][2] + " |");
-            System.out.println("---------");
-
-
-
-            // Evaluar el estado del juego
-            if (verificarVictoria(tablero, 'X')) {
-                System.out.println("X wins");
-                break;
-            } else if (verificarVictoria(tablero, 'O')) {
-                System.out.println("O wins");
-                break;
-            } else if (tableroLleno(tablero)) {
-                System.out.println("Draw");
-                break;
-            }
-
-            // continua el juego
-            if (turno == 'X') {
-                turno = 'O';
-            } else {
-                turno = 'X';
+                BOARD[i][j] = ' ';
             }
         }
     }
-    
+
+    /** Prints the board to the console using nested loops. */
+    public static void printBoard() {
+        System.out.println("---------");
+        for (int i = 0; i < BOARD_SIZE; i++) {
+            System.out.print("| ");
+            for (int j = 0; j < BOARD_SIZE; j++) {
+                System.out.print(BOARD[i][j] + " ");
+            }
+            System.out.println("|");
+        }
+        System.out.println("---------");
+    }
+
     /**
-     * Saber si hay empate, solia tenerlo contador y ahora como boolean  //esto es un Javadoc
-    *@param tablero la matriz del juego
-    *@return true si no hay espacios vacios, false si hay al menos uno
+     * Checks if the board is full.
+     *
+     * @return true if there are no free spaces
      */
-    public static boolean tableroLleno(final char[][] tablero) {
-            for (int r = 0; r < BOARD_SIZE; r++) {
-                for (int c = 0; c < BOARD_SIZE; c++) {
-                    if (tablero[r][c] == ' ') {
-                        return false;
-                    }
+    public static boolean fullBoard() {
+        for (int r = 0; r < BOARD_SIZE; r++) {
+            for (int c = 0; c < BOARD_SIZE; c++) {
+                if (BOARD[r][c] == ' ') {
+                    // If there are blanks, returns false
+                    return false;
                 }
             }
-            return true;
-        // saber si hay empate NUEVOOO
+        }
+        // If there are no blanks, returns true
+        return true;
     }
 
     /**
-     * Verifica si un jugador ha ganado
+     * Verifies if someone won.
      *
-     * @param tablero la matriz del juego
-     * @param p es el caracter del jugador, X u O
-     * @return true si el jugador gano
+     * @param p is X or O
+     * @return true if a player wins
      */
-    public static boolean verificarVictoria(final char[][] tablero, final char p){
-        return tablero[0][0] == p && tablero[0][1] == p && tablero[0][2] == p
-                || tablero[1][0] == p && tablero[1][1] == p && tablero[1][2] == p
-                || tablero[2][0] == p && tablero[2][1] == p && tablero[2][2] == p
-                || tablero[0][0] == p && tablero[1][0] == p && tablero[2][0] == p
-                || tablero[0][1] == p && tablero[1][1] == p && tablero[2][1] == p
-                || tablero[0][2] == p && tablero[1][2] == p && tablero[2][2] == p
-                || tablero[0][0] == p && tablero[1][1] == p && tablero[2][2] == p
-                || tablero[0][2] == p && tablero[1][1] == p && tablero[2][0] == p;
-        // VERIFICAR VICTORIA O EMPATE NUEVOO
-
+    public static boolean verifyVictory(final char p) {
+        return BOARD[0][0] == p && BOARD[0][1] == p && BOARD[0][2] == p
+                || BOARD[1][0] == p && BOARD[1][1] == p && BOARD[1][2] == p
+                || BOARD[2][0] == p && BOARD[2][1] == p && BOARD[2][2] == p
+                || BOARD[0][0] == p && BOARD[1][0] == p && BOARD[2][0] == p
+                || BOARD[0][1] == p && BOARD[1][1] == p && BOARD[2][1] == p
+                || BOARD[0][2] == p && BOARD[1][2] == p && BOARD[2][2] == p
+                || BOARD[0][0] == p && BOARD[1][1] == p && BOARD[2][2] == p
+                || BOARD[0][2] == p && BOARD[1][1] == p && BOARD[2][0] == p;
     }
 
     /**
-     * Verifica si las coordenadas son validas
+     * Verifies if coordinates are valid.
      *
-     * @param fila coordenada de la fila
-     * @param columna coordenada de la columna
-     * @return true si es valida, false si esta fuera de rango
+     * @param row coordinate
+     * @param column coordinate
+     * @return true if its valid
      */
-    public static boolean coordenadaValida(final int fila,final int columna) {
-        return fila >= 1 && fila <= BOARD_SIZE && columna >= 1 && columna <= BOARD_SIZE;
+    public static boolean isValid(final int row, final int column) {
+        return row >= 1 && row <= BOARD_SIZE
+                && column >= 1 && column <= BOARD_SIZE;
     }
-
 
     /**
-     * Verifica si la casilla esta libre
+     * Verifies if its free.
      *
-     * @param tablero en matriz
-     * @param fila del 1 al 3
-     * @param columna del 1 al 3
-     * @return true si la casilla esta disponible
+     * @param row 1 to 3
+     * @param column 1 to 3
+     * @return true if coordinate is available
      */
-
-    public static boolean casillaLibre(final char[][] tablero, final int fila,
-                                       final int columna) {
-        return tablero[fila - 1][columna - 1] == ' ';
+    public static boolean isFree(final int row, final int column) {
+        return BOARD[row - 1][column - 1] == ' ';
     }
 
+    /**
+     * Injects a specific board configuration for unit testing.
+     *
+     * @param testBoard the mock board
+     */
+    //testBoard is just a temporal parameter that receives info from tests.
+    public static void setTestBoard(final char[][] testBoard) {
+        for (int i = 0; i < BOARD_SIZE; i++) {
+            // We copy
+            System.arraycopy(testBoard[i], 0, BOARD[i], 0, BOARD_SIZE);
+        }
+    }
 }

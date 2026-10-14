@@ -9,21 +9,20 @@
     <version>1.0-SNAPSHOT</version>
 
     <properties>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
+        <!-- Updated to Java 21 LTS -->
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
-    <!-- Dependencias de Testing -->
+    <!-- Testing Dependencies -->
     <dependencies>
-        <!-- JUnit 5 para pruebas unitarias -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
             <version>5.10.2</version>
             <scope>test</scope>
         </dependency>
-        <!-- Mockito para simulación de objetos -->
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-junit-jupiter</artifactId>
@@ -34,24 +33,24 @@
 
     <build>
         <plugins>
-            <!-- Plugin del compilador -->
+            <!-- Compiler Plugin -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.13.0</version>
                 <configuration>
-                    <release>17</release>
+                    <release>21</release>
                 </configuration>
             </plugin>
 
-            <!-- Surefire Plugin: Encargado de correr las pruebas de JUnit -->
+            <!-- Surefire Plugin -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.2.5</version>
             </plugin>
 
-            <!-- JaCoCo Plugin: Genera el reporte de cobertura de pruebas -->
+            <!-- JaCoCo Plugin -->
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
@@ -98,7 +97,7 @@
                 </executions>
             </plugin>
 
-            <!-- 1. Checkstyle Plugin -->
+            <!-- Checkstyle Plugin -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
@@ -119,7 +118,7 @@
                 </executions>
             </plugin>
 
-            <!-- 2. PMD Plugin -->
+            <!-- PMD Plugin -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-pmd-plugin</artifactId>
@@ -127,6 +126,7 @@
                 <configuration>
                     <failOnViolation>true</failOnViolation>
                     <printFailingErrors>true</printFailingErrors>
+                    <targetJdk>20</targetJdk>
                 </configuration>
                 <executions>
                     <execution>
@@ -138,12 +138,13 @@
                 </executions>
             </plugin>
 
-            <!-- 3. SpotBugs Plugin -->
+            <!-- SpotBugs Plugin -->
             <plugin>
                 <groupId>com.github.spotbugs</groupId>
                 <artifactId>spotbugs-maven-plugin</artifactId>
                 <version>4.8.6.0</version>
                 <configuration>
+                    <skip>false</skip> <!-- Switch to true to bypass -->
                     <effort>Max</effort>
                     <threshold>Normal</threshold>
                     <failOnError>false</failOnError>
@@ -168,7 +169,7 @@
         </plugins>
     </build>
 
-    <!-- Sección para generar los reportes en HTML -->
+    <!-- Section for HTML reports -->
     <reporting>
         <plugins>
             <plugin>
@@ -180,6 +181,14 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-pmd-plugin</artifactId>
                 <version>3.21.2</version>
+                <configuration>
+                    <targetJdk>20</targetJdk>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>com.github.spotbugs</groupId>
+                <artifactId>spotbugs-maven-plugin</artifactId>
+                <version>4.8.6.0</version>
             </plugin>
         </plugins>
     </reporting>

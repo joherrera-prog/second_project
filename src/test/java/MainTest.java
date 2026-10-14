@@ -1,169 +1,138 @@
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.io.InputStream;
+class MainTest {
 
-class MainTest{
+    @BeforeEach
+        // Resets the board before every test to avoid conflicts
+    void setUp() {
+        Main.initializeBoard();
+    }
 
     @Test
-    //Cuando esta vacio rentorna falso
-    void testTableroLlenoVacio() {
-        //Preparamos un tablero totalmente vacio
-        char[][] tableroVacio = {
+    void testEmpty() {
+        char[][] emptyBoard = {
                 {' ', ' ', ' '},
                 {' ', ' ', ' '},
                 {' ', ' ', ' '}
         };
-
-        //Verificamos, esperamos que sea Falso que el tablero este lleno
-        boolean resultado = Main.tableroLleno(tableroVacio);
-        assertFalse(resultado, "El tablero vacio "
-               +                 "no deberia estar lleno");
+        //We send this empty board to testBoard which will be sent to BOARD
+        Main.setTestBoard(emptyBoard);
+        assertFalse(Main.fullBoard(), "Empty board should not be full");
     }
 
     @Test
-    //Retorna verdadero cuando esta lleno
-    void testTableroLlenoLleno () {
-        //preparamos un tablero sin ningun espacio en blanco
-        char[][] tableroCompletamenteLleno = {
+    void testFull() {
+        char[][] fullyFullBoard = {
                 {'X', 'O', 'X'},
                 {'X', 'O', 'O'},
                 {'O', 'X', 'X'}
         };
-
-        //Verificamos, esperamos que sea Verdadero que el tablero este lleno
-        boolean resultado = Main.tableroLleno(tableroCompletamenteLleno);
-        assertTrue(resultado, "El tablero sin espacios "
-                                + "deberia marcarse como lleno");
-
+        Main.setTestBoard(fullyFullBoard);
+        assertTrue(Main.fullBoard(), "Board must be full");
     }
 
-    //Probamos que funcione X pueda ganar de manera horizontal
     @Test
-    void testVictoriaHorizontal() {
-        char [][] tableroHorizontal = {
+    void testHorizontal() {
+        char[][] horizontalBoard = {
                 {'X', 'X', 'X'},
                 {' ', 'O', ' '},
                 {' ', ' ', 'O'}
         };
-        //Esperamos que X gane, y que O no gane en el mismo tablero
-        assertTrue(Main.verificarVictoria(tableroHorizontal, 'X'),
-                "X deberia ganar en la primera fila");
+        Main.setTestBoard(horizontalBoard);
+        assertTrue(Main.verifyVictory('X'), "X should win in the first row");
     }
 
-    //Probamos que funcione X pueda ganar de manera horizontal
     @Test
-    void testVictoriaVertical() {
-        char [][] tableroVertical = {
+    void testVertical() {
+        char[][] verticalBoard = {
                 {'X', ' ', ' '},
                 {'X', 'O', ' '},
                 {'X', ' ', 'O'}
         };
-        //Esperamos que X gane, y que O no gane en el mismo tablero
-        assertTrue(Main.verificarVictoria(tableroVertical, 'X'),
-                "X deberia ganar en la primera columna");
+        Main.setTestBoard(verticalBoard);
+        assertTrue(Main.verifyVictory('X'), "X should win in the first column");
     }
 
-    //Probamos que funcione X pueda ganar de manera horizontal
     @Test
-    void testVictoriaDiagonal() {
-        char [][] tableroDiagonal = {
+    void testDiagonal() {
+        char[][] diagonalBoard = {
                 {'X', ' ', ' '},
                 {'O', 'X', ' '},
                 {'O', ' ', 'X'}
         };
-        //Esperamos que X gane, y que O no gane en el mismo tablero
-        assertTrue(Main.verificarVictoria(tableroDiagonal, 'X'),
-                "X deberia ganar en la primera columna");
+        Main.setTestBoard(diagonalBoard);
+        assertTrue(Main.verifyVictory('X'), "X should win in the first diagonal");
     }
 
-    //Probamos que no termine el juego si nadie ha ganado y el tablero esta incompleto
     @Test
-    void testIncompleto() {
-        char [][] tableroIncompleto = {
+    void testIncomplete() {
+        char[][] incompleteBoard = {
                 {'X', 'O', ' '},
                 {'O', 'O', 'X'},
                 {'O', 'X', 'X'}
         };
-        //Esperamos que X gane, y que O no gane en el mismo tablero
-        assertFalse(Main.verificarVictoria(tableroIncompleto, 'X'),
-                "X no deberia ganar aun");
-        assertFalse(Main.verificarVictoria(tableroIncompleto, 'O'),
-                "O no deberia ganar aun");
+        Main.setTestBoard(incompleteBoard);
+        assertFalse(Main.verifyVictory('X'), "X should not win yet");
+        assertFalse(Main.verifyVictory('O'), "O should not win yet");
     }
 
-    //Probmos coordenadas validas e invalidas
     @Test
-    void testCoordenadaValida(){
-        assertTrue(Main.coordenadaValida(1, 1), "1,1 deberia ser valido");
-        assertTrue(Main.coordenadaValida(3, 3), "3,3 deberia ser valido");
+    void testCoordinate() {
+        assertTrue(Main.isValid(1, 1), "1,1 should be valid");
+        assertTrue(Main.isValid(3, 3), "3,3 should be valid");
 
-        assertFalse(Main.coordenadaValida(0, 2), "0,2 fuera de rango");
-        assertFalse(Main.coordenadaValida(4, 2), "4,2 fuera de rango");
-        assertFalse(Main.coordenadaValida(2, 4), "2,4 fuera de rango");
+        assertFalse(Main.isValid(0, 2), "0,2 should be invalid");
+        assertFalse(Main.isValid(4, 2), "4,2 should be invalid");
+        assertFalse(Main.isValid(2, 4), "2,4 should be invalid");
     }
 
-    //Verificamos si sirve el detecatador de casillas libres
     @Test
-    void testCassillaLibre(){
-        char[][] tableroPrueba = {
+    void testFree() {
+        char[][] freeBoard = {
                 {'X', ' ', ' '},
                 {' ', 'O', ' '},
                 {' ', ' ', 'X'}
         };
-
-        assertTrue(Main.casillaLibre(tableroPrueba, 1,2), "Esta casilla deberia estar libre");
-        assertFalse(Main.casillaLibre(tableroPrueba, 1,1), "Esta casilla esta ocupada por X");
-        assertFalse(Main.casillaLibre(tableroPrueba, 2,2), "Esta casilla esta ocupada por X");
+        Main.setTestBoard(freeBoard);
+        assertTrue(Main.isFree(1, 2), "This box should be empty");
+        assertFalse(Main.isFree(1, 1), "This box should be occupied by X");
+        assertFalse(Main.isFree(2, 2), "This box should be occupied by X");
     }
 
-    //Simulamos una partida completa donde X gana
     @Test
-    void testJuego_X_Gana(){
-        //simulamos los enters usando \n
-        //Jugadas: X(1,1), O(2,1), X(1,2), O(2,2), X(1,3) -> X gana en la fila 1
-        String entradasSimuladas = "1 1\n2 1\n1 2\n2 2\n1 3\n";
-
-        // Guardamos el teclado real (System.in) para no descomponerlo
+    void testGame() {
+        String testMoves = "1 1\n2 1\n1 2\n2 2\n1 3\n";
+        //We save the keyboard input location
         InputStream inOriginal = System.in;
 
-        try{
-            //Remplazamos el teclado por nuestro string simulador
-            System.setIn(new ByteArrayInputStream(entradasSimuladas.getBytes(StandardCharsets.UTF_8)));
-
-            //ejecutamos el juego completo
+        try {
+            //We change the input type to take the string
+            System.setIn(new ByteArrayInputStream(testMoves.getBytes(StandardCharsets.UTF_8)));
+            //We run the whole game
             Main.main(new String[]{});
-        }finally{
-            //restauramos el teclado real al terminar la prueba
+        } finally {
+            //We change back to keyboard
             System.setIn(inOriginal);
         }
     }
 
-    //Simulamos errores y empate
     @Test
-    void testJuegoEmpateY_Errores(){
-        //simulamos los enters usando \n
-        //"letra" (inválido), "4 1" (fuera de rango), "1 1" (X), "1 1" (ocupado)
-        String entradas = "letra\n4 1\n1 1\n1 1\n1 2\n1 3\n2 1\n2 3\n2 2\n3 1\n3 3\n3 2\n";
-
-        // Guardamos el teclado real (System.in) para no descomponerlo
+    void testGameTwo() {
+        String inputs = "letter\n4 1\n1 1\n1 1\n1 2\n1 3\n2 1\n2 3\n2 2\n3 1\n3 3\n3 2\n";
         InputStream inOriginal = System.in;
 
-        try{
-            //Remplazamos el teclado por nuestro string simulador
-            System.setIn(new ByteArrayInputStream(entradas.getBytes(StandardCharsets.UTF_8)));
-
-            //ejecutamos el juego completo
+        try {
+            System.setIn(new ByteArrayInputStream(inputs.getBytes(StandardCharsets.UTF_8)));
             Main.main(new String[]{});
-        }finally{
-            //restauramos el teclado real al terminar la prueba
+        } finally {
             System.setIn(inOriginal);
         }
     }
-
-
 }
